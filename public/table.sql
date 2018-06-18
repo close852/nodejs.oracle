@@ -1,0 +1,11 @@
+CREATE TABLE t_user(
+userid VARCHAR2(40) NOT NULL PRIMARY KEY,
+PASSWORD VARCHAR2(200) NOT NULL,
+username VARCHAR2(40) NOT NULL,
+status CHAR(1) DEFAULT '1',
+salt VARCHAR2(200)
+);
+
+--COMMIT:
+
+--INSERT INTO t_user VALUES('root','root','루트','1','');
