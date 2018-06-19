@@ -4,9 +4,12 @@ const controller = require('./user.controller')
 
 router.get('/welcome',controller.welcome);
 
-router.get('/login',controller.login)
-router.post('/login',controller.postLogin)
+router.route('/login')
+.get(controller.loginGet)
+.post(controller.loginPost)
 
-
+router.route('/register')
+.get(controller.registerGet)
+.post(controller.registerPost)
 
 module.exports = router

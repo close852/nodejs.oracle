@@ -1,47 +1,47 @@
-var oracledb = require('oracledb');
-      oracledb.outFormat = oracledb.OBJECT;
-var dbConfig = require('../../config/oracleConfig');
+const userDAO = require('./dao/userDAO');
+
 exports.welcome = (req,res)=>{
     res.send('Welcome!')
 }
 
-exports.login = (req,res)=>{
+exports.loginGet = (req,res)=>{
     res.render('./user/login')
 }
-
-exports.postLogin = (req,res)=>{
-    var conn;
-    const {userid, password} = req.body;
-    console.log(userid,password);
-    const sql ='select userid, password from t_user where userid=:userid'
-    const params={
-        userid : userid
-    }
-    oracledb.getConnection(dbConfig)
-    .then(c=>{
-        conn = c;
-        return conn.execute(sql,params);
-    })
-    .then(result=>{
-        console.log(result.rows)
-        return result.rows;
-    }).catch(e=>console.log(e.message))
-    .then(data=>{
-        if(data[0].USERID===userid && data[0].PASSWORD===password){
-            console.log('login success');
-            res.redirect('/user/welcome');
+exports.loginPost=(req,res)=>{
+    const {userid,password} = req.body;
+    var data = userDAO.getUserInfoById(userid);
+    data.then(rows=>{
+        if(rows[0].USERID==userid && rows[0].PASSWORD ==password){
+            console.log('login Success!',userid);
+            res.redirect('/');
+        }else{
+            console.log('login Fail!',userid,password);
+            res.redirect('/user/login')
         }
+    }).catch(err=>{
+        res.status(500).send(err.message).end()
     })
-    .then(doRelease(conn))
-    .catch(err => console.error(err.message))
 }
 
-doRelease= (conn)=>{
-    if(conn){
-        conn.close((err)=>{
-            if(err){
-                console.log(err.message);
-            }
-        });
+exports.registerGet=(req,res)=>{
+    res.render('./user/register')
+}
+exports.registerPost=(req,res)=>{
+    const{userid,password,username} = req.body;
+    const user ={
+        userid : userid,
+        password : password,
+        username : username
     }
+    var data = userDAO.insertUser(user);
+    data.then(result=>{
+        console.log(result);
+        if(result){
+            res.redirect('/');
+        }else{
+            res.redirect('/user/register')
+        }
+    }).catch(err=>{
+        res.status(500).send(err.message).end()
+    })
 }

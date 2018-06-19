@@ -1,0 +1,16 @@
+doctype html
+html
+    head
+        meta(charset='utf-8')
+        title LOGIN WELCOME~
+    body
+        h1 LOGIN
+        form(action="/user/register", method="post")
+            div
+                input(type="text", name="userid" placeholder='userid')
+            div
+                input(type="password", name="password" placeholder='password')
+            div
+                input(type="text", name="username" placeholder='username')
+            div
+                input(type="submit", value="회원가입")

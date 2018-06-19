@@ -13,7 +13,6 @@ app.use('/',routes);
 app.get('/',(req,res)=>{
     res.redirect('/user/welcome');
 })
-
 app.listen(port,(req,res)=>{
     console.log('Connected port '+port+'!')
 })
