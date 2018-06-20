@@ -22,6 +22,15 @@ exports.loginPost=(req,res)=>{
         res.status(500).send(err.message).end()
     })
 }
+exports.test =(req,res)=>{
+    
+    const data =userDAO.getUserById('root');
+    data.then((rst)=>{
+        console.log(rst)
+        res.send(rst)
+    });
+    // ;
+}
 
 exports.registerGet=(req,res)=>{
     res.render('./user/register')
@@ -35,7 +44,7 @@ exports.registerPost=(req,res)=>{
     }
     var data = userDAO.insertUser(user);
     data.then(result=>{
-        console.log(result);
+        console.log('success count:',result);
         if(result){
             res.redirect('/');
         }else{

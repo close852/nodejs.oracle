@@ -1,68 +1,61 @@
 var oracledb = require('oracledb');
 var dbConfig = require('../../../config/oracleConfig');
 var path = require('path');
-exports.insertUser=(user)=>{
+exports.insertUser= async (user)=>{
     const sql = 'insert into t_user(userid,password,username) values(:userid,:password,:username)'
     const params ={
         userid : user.userid,
         password : user.password,
         username : user.username
     }
-    return new Promise((resolve,reject)=>{
-        let conn;
-        oracledb.getConnection(dbConfig)
-        .then(c=>{
-            conn = c
-            console.log('DB Connected!')
-            return conn.execute(sql,params,{autoCommit:true})
-        })
-        .then(result=>{
-            console.log('==== execute query ====\n',__filename,'\n',sql,params,'\n==== execute query ====')
-            resolve(result.rowsAffected);
-        }).catch(err=>{
-            console.log('ERROR!! ',err.message);
-            reject(err);
-        })
+    let conn;
+    try{
+        conn = await oracledb.getConnection(dbConfig)
+        console.log('DB Connected!')
+        const result = await conn.execute(sql,params);
+        await conn.commit()
         .then(()=>{
-            if(conn){
-                return conn.close();
-            }
-         })
-         .then(()=> console.log('Connection Closed'))
-         .catch(err=>{
-             console.log('Error closing connection ',err);
-         })
-    })
+            console.log('commit :',result.rowsAffected)
+        })
+        .catch(err=>console.log(err.message));
+        return result.rowsAffected;
+    }catch(err){
+        await conn.rollback().then(()=>{
+            console.log('rollback :',err.message)
+        })
+        .catch(err=>console.error('rollback err',err.message));
+    }finally{
+        dbRelease(conn);
+    }
 }
-exports.getUserInfoById=(userid)=>{
+
+
+
+exports.getUserInfoById= async (userid)=>{
     const sql ='select userid, password,username from t_user where userid=:userid and status=1'
     const params={
         userid : userid
     }
-    return new Promise((resolve,reject)=>{
-        let conn;
-        oracledb.getConnection(dbConfig)
-        .then(c=>{
-            console.log('DB Connected!');
-            conn = c;
-            return conn.execute(sql,params,{outFormat:oracledb.OBJECT})
+    let conn;
+    try{
+        conn = await oracledb.getConnection(dbConfig);
+        console.log('DB Connected!')
+        console.log('<==== execute query ====>\n',sql,'\n params :',params,'\n',__filename,'\n</==== execute query ====>')
+        const result = await conn.execute(sql,params,{outFormat:oracledb.OBJECT})
+        return result.rows;
+    }catch(err){
+        console.error('ERROR~~!!',err.message)
+    }finally{
+        await dbRelease(conn);     
+    }
+}
+dbRelease= async (conn)=>{
+    if(conn){
+        await conn.close()
+        .then(()=>console.log('Connection closed'))
+        .catch(err=>{
+            console.error('closed error',err.message);
         })
-        .then(result=>{
-            console.log('==== execute query ====\n',__filename,'\n',sql,params,'\n==== execute query ====')
-            resolve(result.rows);
-        }).catch(err=>{
-            console.log('ERROR!! ',err.message);
-            reject(err);
-        })
-        .then(()=>{
-            if(conn){
-                return conn.close();
-            }
-         })
-         .then(()=> console.log('Connection Closed'))
-         .catch(err=>{
-             console.log('Error closing connection ',err);
-         })
-    })
+    }
 }
 
