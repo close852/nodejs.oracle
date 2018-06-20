@@ -12,4 +12,14 @@ router.route('/register')
 .get(controller.registerGet)
 .post(controller.registerPost)
 
+
+router.route('/update')
+.get(controller.updateGet)
+.put(controller.updatePut)
+
+router.route('/delete')
+.get(controller.deleteGet)
+.delete(controller.delete)
+
+
 module.exports = router

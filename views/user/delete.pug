@@ -1,0 +1,11 @@
+doctype html
+html
+    head
+        meta(charset='utf-8')
+        title DELETE WELCOME~
+    body
+        h1 DELETE
+        form(action="/user/delete", method="post")
+            input(type="hidden", name="_method" value='delete')
+            input(type="hidden", name="userid" value=userid)
+            input(type="submit", value="R U SURE?")

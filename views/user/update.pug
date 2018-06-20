@@ -1,0 +1,20 @@
+doctype html
+html
+    head
+        meta(charset='utf-8')
+        title LOGIN WELCOME~
+    body
+        h1 LOGIN
+        form(action="/user/update", method="post")
+            input(type="hidden" name="_method" value="put")
+            input(type="hidden" name="salt" value=user.SALT) 
+            input(type="hidden" name="oriPassword" value=user.PASSWORD) 
+            -//salt는 어떻게 가지고 있는 것이 바람직할지 고민해보기
+            div
+                input(type="text" name="userid" placeholder='userid' value=user.USERID readonly)
+            div
+                input(type="password" name="password" placeholder='password' )
+            div
+                input(type="text" name="username" placeholder='username' value=user.USERNAME)
+            div
+                input(type="submit" value="정보수정")
