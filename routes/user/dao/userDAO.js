@@ -33,7 +33,7 @@ exports.insertUser= async (user)=>{
 
 
 exports.getUserInfoById= async (userid)=>{
-    const sql ='select userid, password,username,salt from t_user where userid=:userid and status=1'
+    const sql ='select userid, password,username,salt,status from t_user where userid=:userid and status=1'
     const params={
         userid : userid
     }

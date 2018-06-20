@@ -2,7 +2,8 @@ const userDAO = require('./dao/userDAO');
 const pbkdf2Password = require('pbkdf2-password');
 const hasher = pbkdf2Password();
 exports.welcome = (req,res)=>{
-    res.render('./user/welcome')
+    console.log('req.session.user',req.session)
+    res.render('./user/welcome',{user:req.session.user})
 }
 
 exports.loginGet = (req,res)=>{
@@ -12,26 +13,39 @@ exports.loginPost=(req,res)=>{
     const {userid,password} = req.body;
     var data = userDAO.getUserInfoById(userid);
         data.then(rows=>{
-            if(rows[0]){
-                var opt ={
-                    password : password,
-                    salt : rows[0].SALT
-                }
-                return hasher(opt,(err,pass,salt,hash)=>{
-                    if(rows[0].PASSWORD === hash){
+            if(rows.length){
+                return rows[0]
+            }else{
+                throw new Error('login auth fail!')
+            }
+        })
+        .catch(err=>{
+            res.status(500).send(err.message).end()
+        })
+        .then((rows)=>{
+            var opt ={
+                password : password,
+                salt : rows.SALT
+            }
+            return new Promise((resolve,reject)=>{
+                hasher(opt,(err,pass,salt,hash)=>{
+                    if(rows.PASSWORD === hash){
                         console.log('login Success!',userid);
-                        res.redirect('/');
+                        resolve(rows);
                     }else{
-                        console.log('login Fail!',userid,password);
-                        res.redirect('/user/login')
+                        reject(new Error('login fail!'))
                     }
                 })
-            }else{
-                throw new Error('login fail')
-                // console.log('login Fail!',userid,password);
-                // res.redirect('/user/login')
-            }
-        }).catch(err=>{
+            })
+        })
+        .then(user=>{
+            console.log('user...')
+                req.session.user = user
+                req.session.save(()=>{
+                    res.redirect('/user/welcome')
+                })
+        })
+        .catch(err=>{
             res.status(500).send(err.message).end()
         })
 }
@@ -63,6 +77,10 @@ exports.registerPost=(req,res)=>{
         data.then(result=>{
             console.log('success count:',result);
             if(result){
+                req.session.user = user
+                return req.session.save((err)=>{
+                    res.redirect('/');
+                })
                 res.redirect('/');
             }else{
                 res.redirect('/user/register')
@@ -77,7 +95,7 @@ exports.updateGet=(req,res)=>{
     const userid ='root'
     const data = userDAO.getUserInfoById(userid);
     data.then(rows=>{
-        res.render('./user/update',{user : rows[0]})
+        res.render('./user/update',{user : rows})
     })
     .catch(err=>{
         console.log(err.message)
@@ -110,7 +128,10 @@ exports.updatePut= async (req,res)=>{
         const data = userDAO.updateUserInfoById(user)
         data.then(rowsAffected=>{
             if(rowsAffected){
-                res.redirect('/')
+                req.session.user = user
+                return req.session.save((err)=>{
+                    res.redirect('/');
+                })
             }else{
                 res.redirect('/user/update')
             }

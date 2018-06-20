@@ -4,10 +4,18 @@ var app = express();
 var routes = require('./routes');
 var port = 3000;
 var methodOverride = require('method-override')
+var session = require('express-session')
 
 app.set('view engine','pug');
 app.set('views','./views');
 
+app.use(session({
+    secret : "GeMty45fNwiGV5OCfCX0j8P",
+    resave : false,
+    saveUninitialized : true
+    // ,
+    // cookie :{secure : true}
+}))
 app.use(bodyParser.urlencoded({extended : false}))
 app.use(methodOverride((req,res)=>{
     if(req.body && typeof req.body ==='object' && req.body._method){
