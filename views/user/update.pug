@@ -4,17 +4,17 @@ html
         meta(charset='utf-8')
         title LOGIN WELCOME~
     body
-        h1 LOGIN
+        h1 UPDATE 
         form(action="/user/update", method="post")
             input(type="hidden" name="_method" value="put")
-            input(type="hidden" name="salt" value=user.SALT) 
-            input(type="hidden" name="oriPassword" value=user.PASSWORD) 
+            input(type="hidden" name="salt" value=user.salt) 
+            input(type="hidden" name="oriPassword" value=user.password) 
             -//salt는 어떻게 가지고 있는 것이 바람직할지 고민해보기
             div
-                input(type="text" name="userid" placeholder='userid' value=user.USERID readonly)
+                input(type="text" name="userid" placeholder='userid' value=user.userid readonly)
             div
                 input(type="password" name="password" placeholder='password' )
             div
-                input(type="text" name="username" placeholder='username' value=user.USERNAME)
+                input(type="text" name="username" placeholder='username' value=user.username)
             div
                 input(type="submit" value="정보수정")

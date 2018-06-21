@@ -21,5 +21,6 @@ router.route('/delete')
 .get(controller.deleteGet)
 .delete(controller.delete)
 
-
+router.route('/logout')
+.get(controller.logout)
 module.exports = router

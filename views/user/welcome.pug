@@ -4,16 +4,16 @@ html
         meta(charset=utf-8)
         title WELCOME
     body
-        
+        h1 WELCOME #{user?user.username+'님':''}
         -if(user){
-        h1 WELCOME  #{user.USERNAME}님
+            a(href="/user/logout") LOGOUT
+            span  |  
+            a(href="/user/update") UPDATE
+            span  | 
+            a(href="/user/delete") DELETE
         -}else{
-            div
-                a(href="/user/login") LOGIN
-                span  | 
-                a(href="/user/register") REGISTER
-                span  | 
-                a(href="/user/update") UPDATE
-                span  | 
-                a(href="/user/delete") DELETE
+            a(href="/user/login") LOGIN
+            span  | 
+            a(href="/user/register") REGISTER
+
         -}
